@@ -109,6 +109,7 @@ body {
  #button{
   width: 125px;
   transition: border 2s;
+  margin-bottom: 1%;
 
   
  }
