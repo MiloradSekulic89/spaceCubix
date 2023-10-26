@@ -2307,8 +2307,8 @@ function togglePause() {
 
 function startGame() {
   // Hide the Play button and High Scores button
-  const playButton = document.getElementById('startGameButton');
-  const highScoresButton = document.getElementById('highScoresButton');
+  const playButton = document.getElementById('button');
+  const highScoresButton = document.getElementById('HighScoresButton');
   playButton.style.display = 'none';
   highScoresButton.style.display = 'none';
 
