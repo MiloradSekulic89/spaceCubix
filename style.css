@@ -1,8 +1,14 @@
 html {
     height: 100%;
+    width: 100%;
     background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
     overflow: hidden;
   }
+
+body {
+  height: 100%;
+  width: 100%;
+}
   
   #stars {
     width: 1px;
@@ -86,17 +92,7 @@ html {
   }
 
  
-  #button-container {
-    text-align: center; /* Center the buttons horizontally */
-    margin-top: 20px; /* Adjust the top margin as needed */
-    position: absolute;
-    top: 20px; /* Adjust the top position as needed */
-    left: 20px; /* Adjust the left position as needed */
-    z-index: 2; /* Ensure the button is above the canvas */
-    margin-top: 50px;
-    margin-right: 10px;
-  }
-
+  
   #button-container1{
 
     text-align: center;
@@ -106,7 +102,24 @@ html {
     right: 0;
     transform: translateY(50%); /* Center vertically */
     z-index: 2;
+    width: 100%;
+    
   }
+
+ #button{
+  width: 125px;
+  transition: border 2s;
+
+  
+ }
+
+ #button:hover{
+
+  border: solid aqua 1px;
+  border-radius: 20%;
+ }
+
+ 
 
 
   #canvas1 {
@@ -117,4 +130,6 @@ html {
     height: 100%;
     z-index: 1;
 }
+
+
 

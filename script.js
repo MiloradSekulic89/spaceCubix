@@ -7,6 +7,8 @@ const explosionParticles = []; // Array to store explosion particles
 let lives = 3; // Initial number of lives
 let score = 0; // Initial score
 let gameOver = false;
+let scoreMultiplier = 1;
+let hitDetection = false; // detect hits for multiplier
 
 
 
@@ -862,6 +864,7 @@ let miniBossSpawnInterval = 20000;
 function updateElapsedTime() {
   elapsedTime += 1000; // Increment elapsed time by 1 second (1000 milliseconds)
   currentTime += 1000;
+  
 }
 
 function increaseDifficulty() {
@@ -993,9 +996,61 @@ function displayLivesAndScore() {
   ctx.fillText(`Lives: ${lives}`, canvas.width - 100, 30); // Display lives in the top-right corner
   ctx.fillText(`Score: ${score}`, 20, 30);// Display score in the top-left corner
   ctx.fillText(`Station health:${CubixStationLives}`,100,50) ;// Display station health in the top-right corner
+  ctx.fillText(`Multiplier:${scoreMultiplier}`,100,70); // Display score multiplier counter in top left corner
   
   
 }
+
+let hitTime = 0;
+let resetHitTime = false;
+
+function updateMultiplier(){
+
+  if(hitDetection===true ){
+    
+    scoreMultiplier= scoreMultiplier+1;
+    if (scoreMultiplier>=10){
+      playCongratulationSound();
+    }
+    
+    
+  }else{
+    
+    
+    if(hitDetection===false && hitTime >= 5000 && resetHitTime === false){
+    
+    scoreMultiplier=1;
+    hitTime=0;
+    resetHitTime = false;
+    }
+  }
+  
+  }
+
+  function resetHitDetection() {
+    if(hitDetection===true ){
+
+      
+    setTimeout(function() {
+      updateMultiplier();
+      
+      hitDetection=false;
+      if(hitTime >= 5000){
+      console.log("updated hit" +hitTime);
+      resetHitTime= false;
+      }
+    }, 300); 
+
+    setTimeout(function(){
+
+     
+      score = score + 10 * scoreMultiplier;
+      scoreMultiplier=1;
+      
+    },5000)
+  }
+  }
+
 
 // Function to handle collisions between the player's ship and red squares
 function handleShipSquareCollisions() {
@@ -1167,6 +1222,7 @@ function handleWeaponExplosionCollisions() {
           enemiesSmall.splice(j, 1); // Remove the red square
           j--; // Decrement the index to account for the removed square
           score += 10; // Increase the score
+          hitDetection = true;
 
           if(Math.random() <= smallCoinPercentage / 100){
             const smallCoin = {
@@ -1217,6 +1273,7 @@ function handleWeaponExplosionCollisions() {
           enemiesMedium.splice(k, 1); // Remove the blue square
           k--; // Decrement the index to account for the removed square
           score += 10; // Increase the score
+          hitDetection = true;
           createExplosion(weaponCenterX, weaponCenterY, 10); // Adjust the number of particles as needed
           playExplosionSound();
 
@@ -1327,6 +1384,7 @@ function handleWeaponExplosionCollisions() {
             enemiesMiniBoss.splice(z, 1); // Remove the blue square
             z--; // Decrement the index to account for the removed square
             score += 10; // Increase the score
+            hitDetection = true;
             createExplosion(weaponCenterX, weaponCenterY, 1); // Adjust the number of particles as needed
             playExplosionSound();
   
@@ -1385,6 +1443,7 @@ function handleWeaponExplosionCollisions() {
                 enemySideShips.splice(h, 1); // Remove the red square
                 h--; // Decrement the index to account for the removed square
                 score += 10; // Increase the score
+                hitDetection=true;
       
                 if(Math.random() <= smallCoinPercentage / 100){
                   const smallCoin = {
@@ -1445,6 +1504,7 @@ function handleDefenceWeaponExplosionCollision() {
         enemiesMedium.splice(k, 1); // Remove the blue square
         k--; // Decrement the index to account for the removed square
         score += 10; // Increase the score
+        hitDetection = true;
 
         if (Math.random() <= smallCoinPercentage / 100) {
           const smallCoin = {
@@ -1486,6 +1546,7 @@ function handleDefenceWeaponExplosionCollision() {
         enemiesSmall.splice(j, 1); // Remove the red square
         j--; // Decrement the index to account for the removed square
         score += 10; // Increase the score
+        hitDetection = true;
 
         if (Math.random() <= smallCoinPercentage / 100) {
           const smallCoin = {
@@ -1527,6 +1588,7 @@ function handleDefenceWeaponExplosionCollision() {
       enemiesMiniBoss.splice(y, 1); // Remove the red square
       y--; // Decrement the index to account for the removed square
       score += 10; // Increase the score
+      hitDetection = true;
 
       if (Math.random() <= smallCoinPercentage / 100) {
         const smallCoin = {
@@ -1884,7 +1946,7 @@ function moveShip(currentTime) {
     if (deltaTime >= frameInterval) {
 
       
-      console.log(deltaTime.toString());
+     
       currentFrame = (currentFrame + 7) % totalFrames;
     ctx.drawImage(playerShipImage, currentFrame, 2*frameHeight, frameWidth, frameHeight , shipX, shipY, shipWidth, shipHeight);
    
@@ -1900,7 +1962,7 @@ function moveShip(currentTime) {
     if (deltaTime >= frameInterval) {
 
       
-      console.log(deltaTime.toString());
+      
       currentFrame = (currentFrame + 7) % totalFrames;
       ctx.drawImage(playerShipImage, currentFrame, 1*frameHeight, frameWidth, frameHeight , shipX, shipY, shipWidth, shipHeight);
    
@@ -1963,60 +2025,12 @@ function checkAndAwardExtraLife() {
   }
 }
 
-//Gamepad settings
-
-// Gamepad state
-const gamepadState = {
-  left: false,
-  right: false,
-  up: false,
-  down: false,
-  shoot: false,
-};
-
-// Define button and axis mapping
-const buttonMapping = {
-  0: 'shoot',     // Adjust button numbers as needed
-};
-
-const axisMapping = {
-  0: 'left',      // Adjust axis numbers as needed
-  1: 'right',
-  2: 'up',
-  3: 'down',
-};
-
-window.addEventListener("gamepadconnected", (e) => {
-  connectGamepad(e.gamepad);
-});
-
-window.addEventListener("gamepaddisconnected", (e) => {
-  disconnectGamepad(e.gamepad);
-});
-
-function updateGamepadState() {
-  const gamepads = navigator.getGamepads();
-
-  for (let i = 0; i < gamepads.length; i++) {
-    const gamepad = gamepads[i];
-
-    if (gamepad) {
-      for (const buttonIndex in buttonMapping) {
-        const action = buttonMapping[buttonIndex];
-        gamepadState[action] = gamepad.buttons[buttonIndex].pressed;
-      }
-
-      for (const axisIndex in axisMapping) {
-        const action = axisMapping[axisIndex];
-        gamepadState[action] = gamepad.axes[axisIndex] > 0.5;
-      }
-    }
-  }
-}
 
 
 
 function animateGame() {
+
+  console.log(hitTime);
 
   if (lives === 0 || CubixStationLives <=0) {
     showGameOverPopup();
@@ -2088,6 +2102,7 @@ function animateGame() {
   handleDroppableCoinCollisions();
   animateExplosionParticles();
   checkAndAwardExtraLife();
+  resetHitDetection();
   updateElapsedTime();
   requestAnimationFrame(animateGame);
 
@@ -2123,6 +2138,7 @@ const stationHitSound = new Audio('src/audio/boom_c_06-102838.mp3');
 const warningSound1 = new Audio('src/audio/beep-warning-6387.mp3');
 const boss1WeaponSound = new Audio('src/audio/laser-zap-90575.mp3');
 const bossWarningSound = new Audio('src/audio/warning-sound-by-prettysleepy-art-12395.mp3');
+const congratulationSound = new Audio('src/audio/congratulations-deep-voice-172193.mp3');
 
 
 
@@ -2177,6 +2193,11 @@ function playBoss1WeaponSound(){
 function playBossWarningSound(){
   bossWarningSound.currentTime = 0; // Rewind the sound to the beginning (in case it's already playing)
   bossWarningSound.play();
+}
+
+function playCongratulationSound(){
+  congratulationSound.currentTime = 0;
+  congratulationSound.play();
 }
 
 
@@ -2303,7 +2324,7 @@ function startGame() {
     planetsSpawnIntervalId = setInterval(spawnPlanet, 20000);
     boss1SpawnIntervalId = setInterval(spawnBoss, 600000); //
 
-    if (bossDetroyed === true){
+    if (bossDestroyed === true){
 
       enemyShipsPurpleSpawnIntervalId = setInterval (spawnMediumPurpleEnemy, 620000)
     }
